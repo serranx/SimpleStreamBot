@@ -28,10 +28,10 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 async def media_receive_handler(_, m: Message):
     if Var.ALLOWED_USERS and not ((str(m.from_user.id) in Var.ALLOWED_USERS) or (m.from_user.username in Var.ALLOWED_USERS)):
         return await m.reply("You are not <b>allowed to use</b> this <a href='https://github.com/EverythingSuckz/TG-FileStreamBot'>bot</a>.", quote=True)
-    log_msg = await m.forward(chat_id=Var.BIN_CHANNEL)
+    log_msg = await m.forward(chat_id=f"-{Var.BIN_CHANNEL}")
     file_hash = get_hash(log_msg, Var.HASH_LENGTH)
-    stream_link = f"{Var.URL}{Var.BIN_CHANNEL}/{log_msg.id}"
-    short_link = f"{Var.URL}{Var.BIN_CHANNEL}/{log_msg.id}"
+    stream_link = f"https://tgdownloads.dltelegram.workers.dev/{Var.BIN_CHANNEL}/{log_msg.id}"
+    short_link = f"https://tgdownloads.dltelegram.workers.dev/{Var.BIN_CHANNEL}/{log_msg.id}"
     logger.info(f"Generated link: {stream_link} for {m.from_user.first_name}")
     try:
         await m.reply_text(
