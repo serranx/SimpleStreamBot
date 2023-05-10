@@ -1,5 +1,3 @@
-# This file is a part of TG-FileStreamBot
-# Coding : Jyothis Jayanth [@EverythingSuckz]
 
 import logging
 from pyrogram import filters, errors
@@ -9,7 +7,6 @@ from WebStreamer.bot import StreamBot, logger
 from WebStreamer.utils import get_hash, get_name
 from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-
 
 @StreamBot.on_message(
     filters.private
@@ -32,11 +29,16 @@ async def media_receive_handler(_, m: Message):
     file_hash = get_hash(log_msg, Var.HASH_LENGTH)
     stream_link = f"https://tgdownloads.dltelegram.workers.dev/{str(Var.BIN_CHANNEL)[1:]}/{log_msg.id}"
     short_link = f"https://tgdownloads.dltelegram.workers.dev/{str(Var.BIN_CHANNEL)[1:]}/{log_msg.id}"
+    file_name, file_size = get_file_properties(m)
     logger.info(f"Generated link: {stream_link} for {m.from_user.first_name}")
     try:
         await m.reply_text(
-            text="<code>{}</code>\n(<a href='{}'>shortened</a>)".format(
-                stream_link, short_link
+            text="""<b>📁 Filename:</b> <i>{}</i>
+<b>📦 Filesize:</b> <i>{}</i>
+    
+<code>{}</code>
+(<a href='{}'>shortened</a>)""".format(
+                file_name, file_size, stream_link, short_link
             ),
             quote=True,
             disable_web_page_preview=True,
@@ -53,3 +55,32 @@ async def media_receive_handler(_, m: Message):
             quote=True,
             parse_mode=ParseMode.HTML,
         )
+
+def humanbytes(size):
+    if not size:
+        return ""
+    power = 2**10
+    n = 0
+    Dic_powerN = {0: ' ', 1: 'Ki', 2: 'Mi', 3: 'Gi', 4: 'Ti'}
+    while size > power:
+        size /= power
+        n += 1
+    return str(round(size, 2)) + " " + Dic_powerN[n] + 'B'
+
+def get_file_properties(message):
+    media_types = (
+        "audio",
+        "document",
+        "photo",
+        "sticker",
+        "animation",
+        "video",
+        "voice",
+        "video_note",
+    )
+    for attr in media_types:
+        media = getattr(message, attr, None)
+        if media:
+            file_name = getattr(media, "file_name", "")
+            file_size = getattr(media, "file_size", "")
+            return file_name if file_name else "N/A", file_size
