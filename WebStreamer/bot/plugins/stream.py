@@ -38,7 +38,7 @@ async def media_receive_handler(_, m: Message):
     
 <code>{}</code>
 (<a href='{}'>shortened</a>)""".format(
-                file_name, file_size, stream_link, short_link
+                file_name, humanbytes(file_size), stream_link, short_link
             ),
             quote=True,
             disable_web_page_preview=True,
